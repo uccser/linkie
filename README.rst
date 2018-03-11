@@ -3,7 +3,7 @@
 Linkie
 ==============================================================================
 
-Linkie looks through files for broken links using Python 3.
+Linkie looks through files for broken links using Python 3.5+
 
 |Build Status|
 
@@ -13,8 +13,6 @@ Usage
 Linkie will search all files within the directory it's run and any
 subdirectories, and requires a simple YAML config file to run.
 You can then run Linkie from the command line.
-
-http://hayleyavw.com/
 
 .. code-block:: none
 
