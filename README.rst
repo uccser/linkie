@@ -67,7 +67,7 @@ The changelog is available within the `changelog file`_.
 2. ``$ cd linkie``
 3. ``$ pip3 install .``
 
-.. |Linkie logo| image:: https://raw.githubusercontent.com/uccser/linkie/master/linkie/images/linkie-logo.png
+.. |Linkie logo| image:: https://raw.githubusercontent.com/uccser/linkie/master/images/linkie-logo.png
    :target: https://github.com/uccser/linkie
    :alt: Linkie logo
 
