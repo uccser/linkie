@@ -140,10 +140,9 @@ def main():
         config_file = open(config_filepath, 'r')
         custom_config = yaml.load(config_file)
         config_file.close()
-        if 'exclude_directories' in custom_config:
-            config['exclude_directories'] = custom_config['exclude_directories']
-        if 'file_types' in custom_config:
-            config['file_types'] = custom_config['file_types']
+        for key in config.keys():
+            if key in custom_config:
+                config[key] = custom_config[key]
     else:
         print('Using default Linkie configuation')
     return linkie(config)
