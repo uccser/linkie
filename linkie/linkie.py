@@ -16,14 +16,15 @@ def linkie(config):
     update_config(config)
     file_count = 0
     url_count = 0
-    url_status_counts = {}
+    status_counts = {}
     broken_urls = set()
 
     for directory_root, directories, files in os.walk('.'):
         # Remove directories in exclude list
         processed_directories = []
         for directory in directories:
-            if os.path.join(directory_root, directory) not in config['exclude_directories']:
+            directory_path = os.path.join(directory_root, directory)
+            if directory_path not in config['exclude_directories']:
                 processed_directories.append(directory)
         directories[:] = processed_directories
 
@@ -49,7 +50,7 @@ def linkie(config):
                     except:
                         status_code = 999
                     print('= {} status'.format(status_code))
-                    url_status_counts[status_code] = url_status_counts.get(status_code, 0) + 1
+                    status_counts[status_code] = status_counts.get(status_code, 0) + 1
                     if status_code >= 400:
                         broken_urls.add(url)
 
@@ -61,9 +62,9 @@ def linkie(config):
 
     print('\nStatus code counts')
     print('---------------------------------------------')
-    for status in sorted(url_status_counts.keys()):
-        print('{}: {}'.format(status, url_status_counts[status]))
-    if 999 in url_status_counts:
+    for status in sorted(status_counts.keys()):
+        print('{}: {}'.format(status, status_counts[status]))
+    if 999 in status_counts:
         print('Status 999 refers to a connection error.')
 
     print('\nBroken links:')
@@ -71,10 +72,10 @@ def linkie(config):
     if broken_urls:
         for url in broken_urls:
             print(url)
-        sys.exit(1)
+        return 1
     else:
         print('No broken links found!')
-        sys.exit(0)
+        return 0
 
 
 def check_config(config):
@@ -104,26 +105,31 @@ def update_config(config):
 
 
 def main():
+    config = {
+        'exclude_directories': [
+            '.git/',
+            'docs/build/',
+        ],
+        'file_types': [
+            'html',
+            'md',
+            'rst',
+            'txt',
+        ],
+    }
     if len(sys.argv) > 1:
         config_filepath = sys.argv[1]
         print('Using Linkie configuration file {}'.format(config_filepath))
         config_file = open(config_filepath, 'r')
-        config = yaml.load(config_file)
+        custom_config = yaml.load(config_file)
         config_file.close()
+        if 'exclude_directories' in custom_config:
+            config['exclude_directories'] = custom_config['exclude_directories']
+        if 'file_types' in custom_config:
+            config['file_types'] = custom_config['file_types']
     else:
-        config = {
-            'exclude_directories': [
-                '.git/',
-                'docs/build/',
-            ],
-            'file_types': [
-                'html',
-                'md',
-                'rst',
-            ],
-        }
         print('Using default Linkie configuation')
-    linkie(config)
+    return linkie(config)
 
 
 if __name__ == '__main__':

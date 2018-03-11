@@ -11,7 +11,8 @@ setup(
     description='Linkie looks through files for broken links using Python 3.',
     long_description=open('README.rst').read(),
     url='https://github.com/uccser/linkie',
-    author='University of Canterbury Computer Science Education Research Group',
+    author=('University of Canterbury Computer'
+            'Science Education Research Group'),
     author_email='csse-education-research@canterbury.ac.nz',
     license='MIT',
     classifiers=[
@@ -32,9 +33,9 @@ setup(
         'PyYaml==3.12',
     ],
     python_requires='~=3.4',
-        entry_points={
+    entry_points={
         'console_scripts': [
             'linkie = linkie.linkie:main',
         ],
     }
-)
+    )
