@@ -6,10 +6,8 @@ import sys
 import yaml
 import requests
 
-# This isn't a perfect URL matcher, but should catch the large majority of
-# URLs within this project.
-URL_REGEX = r'\bhttps?://[^\ \'\'\)\]\>\`\s]+'
-
+# This isn't a perfect URL matcher, but should catch the large majority of URLs.
+URL_REGEX = r'(https?|ftp)://[^\s/$.?#].[^\s`\'\"\]>}]*'
 
 def linkie(config):
     check_config(config)
@@ -39,6 +37,13 @@ def linkie(config):
                 urls = re.findall(URL_REGEX, file_contents)
                 print('{} URL{} found'.format(len(urls), 's' if len(urls) != 1 else ''))
                 for url in urls:
+                    # Remove extra trailing bracket if link containing brackets
+                    # Within Markdown link syntax.
+                    # [Wikipedia link](http://foo.com/blah_blah_(wikipedia))
+                    if url.endswith(')') and url.count('(') < url.count(')'):
+                        url = url[:-1]
+                    # Remove trailing characters
+                    url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
                     url_count += 1
                     print('  {}) Checking URL {} '.format(url_count, url), end='')
                     try:
