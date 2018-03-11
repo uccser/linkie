@@ -12,12 +12,20 @@ Usage
 
 Linkie will search all files within the directory it's run and any
 subdirectories, and requires a simple YAML config file to run.
+You can then run Linkie from the command line.
 
-Create a YAML file (for example ``linkie.yaml``) that can contain two optional
-settings:
+.. code-block:: none
 
-1) ``exclude_directories`` - Any directories listed here will be ignored.
+  linkie
+
+You can also pass Linkie a YAML file of configuration values (for example
+``linkie linkie.yaml``). The YAML file can contain two optional settings:
+
+1) ``exclude_directories`` - Any directories listed will be ignored, these
+   are relative to the directory Linkie is run from.
 2) ``file_types`` - The file extensions to search for URLs.
+
+Example configuration file (these are the default values Linkie uses):
 
 .. code-block:: yaml
 
@@ -29,13 +37,6 @@ settings:
     - html
     - md
     - rst
-
-You can then run Linkie from the command line, passing the YAML config file as
-a parameter.
-
-.. code-block:: python
-
-  python -m linkie linkie.yaml
 
 License
 ------------------------------------------------------------------------------
