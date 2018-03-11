@@ -14,7 +14,7 @@ Linkie will search all files within the directory it's run and any
 subdirectories, and requires a simple YAML config file to run.
 You can then run Linkie from the command line.
 
-.. code-block:: none
+.. code-block:: bash
 
   linkie
 
@@ -54,10 +54,6 @@ We required a script to check our repositories for broken links.
 This tool was initially written in Python, and a published Python package makes
 it easy for repositories to use this tool, in combination with pyup notifying
 if the package is updated.
-
-**Where is the changelog?**
-
-The changelog is available within the `changelog file`_.
 
 **How do I install the development version as local package?**
 
