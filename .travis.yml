@@ -21,12 +21,3 @@ notifications:
     rooms: deptfunstuff:abJKvzApk5SKtcEyAgtswXAv
     on_success: change
     on_failure: change
-
-deploy:
-  provider: pypi
-  user: UCCSER
-  password:
-    secure: kyMzUVTedjAOIrjkU7U/s9c6mMNXbUO5pl22uijkZbG9Hsqwc98Z+MNPapV4ABeVUGqNF5mpByuB4YwAh0rpFptXszQndWdcl+O/lbid5p0u/7+AkOEw+Tj2V2g+fkByWffdIMo5r+NJPa+sA8Pm+fRroXD9Me0Ce+H5n8X+hZO4szSfzrjrf8Xg5irV9h+JWSbI3/9/YCRB7XIxvQDqnDH8t4mAkeqm8wlY+scsb7JxZgOPbvLnUf3A40xX0MFIGnv99sVsDb0MsTR1PBN5FgY0R3I0jDBuEwTmQfJP0wEN5rZfp03lvXB+u6ipBbqxbvXxLWsGcRk5442t9Bw9d2+8Q1JKfdHAZ7ic8uM3qSiuQ4LF5GGqDF/D1j0F1hp5l9HL3HaySVpgi28Nsir8113hSqIEGtjZNMzTWmvpLVqTLyeaADHg9eQRSvtwIP6Jvc/tuoVmitl/LPjpMHu8XfEYQTz5jwz8omd7m/okcfFdelXUfECrkObw1EK9C3+e5etO0V7ofC9YNZ8VlIgaDcxCsmIevtCyb8nf4g1IosjffLEkXDYhwy1DA7u1jicmTHgR0FTultOZrCbtJCQLZVpjuDpIx44o8FLYOxPzFYYOY3x7MkjH4zfQ7IHEGt4gsiFkcLu1jddCWGRtINK9yEXVBWJxc1WgQa2hRvBual4=
-  distributions: "sdist bdist_wheel"
-  on:
-    branch: master
