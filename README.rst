@@ -3,7 +3,7 @@
 Linkie
 ==============================================================================
 
-Linkie looks through files for broken links using Python 3.
+Linkie looks through files for broken links using Python 3.5+
 
 |Build Status|
 
@@ -14,9 +14,7 @@ Linkie will search all files within the directory it's run and any
 subdirectories, and requires a simple YAML config file to run.
 You can then run Linkie from the command line.
 
-http://hayleyavw.com/
-
-.. code-block:: none
+.. code-block:: bash
 
   linkie
 
@@ -57,17 +55,13 @@ This tool was initially written in Python, and a published Python package makes
 it easy for repositories to use this tool, in combination with pyup notifying
 if the package is updated.
 
-**Where is the changelog?**
-
-The changelog is available within the `changelog file`_.
-
 **How do I install the development version as local package?**
 
 1. ``$ git clone https://github.com/uccser/linkie.git``
 2. ``$ cd linkie``
 3. ``$ pip3 install .``
 
-.. |Linkie logo| image:: https://raw.githubusercontent.com/uccser/linkie/master/linkie/images/linkie-logo.png
+.. |Linkie logo| image:: https://raw.githubusercontent.com/uccser/linkie/master/images/linkie-logo.png
    :target: https://github.com/uccser/linkie
    :alt: Linkie logo
 
