@@ -47,6 +47,18 @@ class LinkieTestSuite(unittest.TestCase):
         linkie = Linkie('linkie.yaml')
         self.assertEqual(linkie.run(), 1)
 
+    def test_skip_urls(self):
+        os.chdir('./linkie/tests/assets/skip_urls/')
+        linkie = Linkie()
+        self.assertEqual(linkie.run(), 0)
+        self.assertEqual(len(linkie.urls), 2)
+
+    def test_skip_urls_custom(self):
+        os.chdir('./linkie/tests/assets/skip_urls_custom/')
+        linkie = Linkie('linkie.yaml')
+        self.assertEqual(linkie.run(), 0)
+        self.assertEqual(len(linkie.urls), 1)
+
     def test_command_line_basic(self):
         linkie = run('linkie', cwd='./linkie/tests/assets/basic/')
         self.assertEqual(linkie.returncode, 0)
@@ -74,7 +86,7 @@ class LinkieTestSuite(unittest.TestCase):
     def test_command_line_file_types_custom(self):
         linkie = run(['linkie', 'linkie.yaml'], cwd='./linkie/tests/assets/file_types_custom/')
         self.assertEqual(linkie.returncode, 1)
-    
+
 
 if __name__ == '__main__':
     unittest.main()

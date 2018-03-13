@@ -32,6 +32,7 @@ class Linkie:
                 'rst',
                 'txt',
             ],
+            'skip_urls': [],
         }
         if config_file_path:
             print('Using Linkie configuration file {}'.format(config_file_path))
@@ -116,7 +117,9 @@ class Linkie:
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
             print('  - Checking URL {} '.format(url), end='')
-            if url not in self.urls:
+            if url in self.config['skip_urls']:
+                print('= skipping URL (as defined in config file)')
+            elif url not in self.urls:
                 try:
                     status_code = requests.head(url).status_code
                     # If response doesn't allow HEAD request, try GET request
