@@ -13,9 +13,8 @@ class Linkie:
 
     def __init__(self, config_file_path=None):
         self.file_count = 0
-        self.url_count = 0
         self.status_counts = {}
-        self.broken_urls = set()
+        self.urls = dict()
         self.directory = '.'
         config = self.read_config(config_file_path)
         self.check_config(config)
@@ -71,10 +70,17 @@ class Linkie:
         config['file_types'] = tuple(file_types)
         return config
 
+    def count_broken_links(self):
+        count = 0
+        for url, url_data in self.urls.items():
+            if url_data['broken']:
+                count += 1
+        return count
+
     def run(self):
         self.traverse_directory()
         self.print_summary()
-        if self.broken_urls:
+        if self.count_broken_links():
             return 1
         else:
             return 0
@@ -109,27 +115,43 @@ class Linkie:
                 url = url[:-1]
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
-            self.url_count += 1
-            print('  {}) Checking URL {} '.format(self.url_count, url), end='')
-            try:
-                status_code = requests.head(url).status_code
-                # If response doesn't allow HEAD request, try GET request
-                if status_code >= 400:
-                    status_code = requests.get(url).status_code
-            # If connection error
-            except:
-                status_code = 999
-            print('= {} status'.format(status_code))
-            self.status_counts[status_code] = self.status_counts.get(status_code, 0) + 1
-            if status_code >= 400:
-                self.broken_urls.add(url)
+            print('  - Checking URL {} '.format(url), end='')
+            if url not in self.urls:
+                try:
+                    status_code = requests.head(url).status_code
+                    # If response doesn't allow HEAD request, try GET request
+                    if status_code >= 400:
+                        status_code = requests.get(url).status_code
+                # If connection error
+                except Exception as e:
+                    status_code = str(type(e).__name__)
+
+                if type(status_code) == str:
+                    print('= {}'.format(status_code))
+                else:
+                    print('= {} status'.format(status_code))
+
+                if type(status_code) == str or status_code >= 400:
+                    self.save_url(url, status_code, True)
+                else:
+                    self.save_url(url, status_code, False)
+                status_code = str(status_code)
+                self.status_counts[status_code] = self.status_counts.get(status_code, 0) + 1
+            else:
+                print('= {} (already checked)'.format(self.urls[url]['status']))
+
+    def save_url(self, url, status_code, broken):
+        self.urls[url] = {
+            'broken': broken,
+            'status': status_code,
+        }
 
     def print_summary(self):
         print('\n=============================================')
         print('SUMMARY')
         print('=============================================')
         print('{} file{} checked'.format(self.file_count, 's' if self.file_count != 1 else ''))
-        print('{} URL{} found'.format(self.url_count, 's' if self.url_count != 1 else ''))
+        print('{} unique URL{} found'.format(len(self.urls), 's' if len(self.urls) != 1 else ''))
 
         print('\nStatus code counts')
         print('---------------------------------------------')
@@ -140,9 +162,10 @@ class Linkie:
 
         print('\nBroken links:')
         print('---------------------------------------------')
-        if self.broken_urls:
-            for url in self.broken_urls:
-                print(url)
+        if self.count_broken_links():
+            for url, url_data in self.urls.items():
+                if url_data['broken']:
+                    print(url)
         else:
             print('No broken links found!')
 
