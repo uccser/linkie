@@ -7,7 +7,8 @@ import yaml
 import requests
 
 # This isn't a perfect URL matcher, but should catch the large majority of URLs.
-URL_REGEX = r'(?:https?|ftp)://[^\s/$.?#].[^\s`\'"\]>}]*'
+URL_REGEX = r'(?:https?|ftp)://[^\s`\'"\]\)>}]+'
+
 
 class Linkie:
 
@@ -112,8 +113,8 @@ class Linkie:
             # Remove extra trailing bracket if link containing brackets
             # Within Markdown link syntax.
             # [Wikipedia link](http://foo.com/blah_blah_(wikipedia))
-            if url.endswith(')') and url.count('(') < url.count(')'):
-                url = url[:-1]
+            if url.count('('):
+                url += url.count('(') * ')'
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
             print('  - Checking URL {} '.format(url), end='')
@@ -150,11 +151,14 @@ class Linkie:
         }
 
     def print_summary(self):
+        number_broken_links = self.count_broken_links()
+
         print('\n=============================================')
         print('SUMMARY')
         print('=============================================')
         print('{} file{} checked'.format(self.file_count, 's' if self.file_count != 1 else ''))
         print('{} unique URL{} found'.format(len(self.urls), 's' if len(self.urls) != 1 else ''))
+        print('{} broken link{} found'.format(number_broken_links, 's' if number_broken_links != 1 else ''))
 
         print('\nStatus code counts')
         print('---------------------------------------------')
