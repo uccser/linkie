@@ -1,4 +1,4 @@
 # flake8: noqa
 from .linkie import Linkie
 
-__version__ = '1.1.1'
+__version__ = '1.2.0'

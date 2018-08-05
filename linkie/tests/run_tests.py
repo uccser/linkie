@@ -11,7 +11,7 @@ class LinkieTestSuite(unittest.TestCase):
 
     def setUp(self):
         os.chdir(self.default_working_directory)
-
+    
     def test_basic(self):
         os.chdir('./linkie/tests/assets/basic/')
         linkie = Linkie()
@@ -34,7 +34,7 @@ class LinkieTestSuite(unittest.TestCase):
 
     def test_excluded_directories_custom(self):
         os.chdir('./linkie/tests/assets/excluded_directories_custom/')
-        linkie = Linkie('linkie.yaml')
+        linkie = Linkie(config_file_path='linkie.yaml')
         self.assertEqual(linkie.run(), 0)
 
     def test_file_types(self):
@@ -44,7 +44,7 @@ class LinkieTestSuite(unittest.TestCase):
 
     def test_file_types_custom(self):
         os.chdir('./linkie/tests/assets/file_types_custom/')
-        linkie = Linkie('linkie.yaml')
+        linkie = Linkie(config_file_path='linkie.yaml')
         self.assertEqual(linkie.run(), 1)
 
     def test_skip_urls(self):
@@ -55,7 +55,7 @@ class LinkieTestSuite(unittest.TestCase):
 
     def test_skip_urls_custom(self):
         os.chdir('./linkie/tests/assets/skip_urls_custom/')
-        linkie = Linkie('linkie.yaml')
+        linkie = Linkie(config_file_path='linkie.yaml')
         self.assertEqual(linkie.run(), 0)
         self.assertEqual(len(linkie.urls), 1)
 
