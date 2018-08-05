@@ -12,64 +12,71 @@ URL_REGEX = r'(?:https?|ftp)://[^\s`\'"\]\)>}]+'
 
 class Linkie:
 
-    def __init__(self, config_file_path=None):
+    def __init__(self, config=None, config_file_path=None):
         self.file_count = 0
         self.status_counts = {}
         self.urls = dict()
         self.directory = '.'
-        config = self.read_config(config_file_path)
-        self.check_config(config)
+        if not config and config_file_path:
+            print('Using Linkie configuration file {}'.format(config_file_path))
+            config = self.read_config(config_file_path)
+        elif config:
+            print('Using custom Linkie settings via Python constructor')
+        elif not config and not config_file_path:
+            print('Using default Linkie configuation')
+        config = self.check_config(config)
         self.config = self.process_config(config)
 
     def read_config(self, config_file_path):
-        config = {
-            'exclude_directories': [
+        config_file = open(config_file_path, 'r')
+        config = yaml.load(config_file)
+        config_file.close()
+        return config
+
+    def check_config(self, config):
+        default_config = {
+            'exclude-directories': [
                 '.git/',
                 'docs/build/',
             ],
-            'file_types': [
+            'file-types': [
                 'html',
                 'md',
                 'rst',
                 'txt',
             ],
-            'skip_urls': [],
+            'skip-urls': [],
         }
-        if config_file_path:
-            print('Using Linkie configuration file {}'.format(config_file_path))
-            config_file = open(config_file_path, 'r')
-            custom_config = yaml.load(config_file)
-            config_file.close()
+        if config:
+            if config.get('exclude-directories'):
+                if type(config['exclude-directories']) != list:
+                    raise TypeError('The exclude-directories value should be a list of directories.')
+            if config.get('file-types'):
+                if type(config['file-types']) != list:
+                    raise TypeError('The file-types value should be a list of file extensions.')
+            if config.get('skip-urls'):
+                if type(config['skip-urls']) != list:
+                    raise TypeError('The skip-urls value should be a list of URLs to skip.')
             for key in config.keys():
-                if key in custom_config:
-                    config[key] = custom_config[key]
-        else:
-            print('Using default Linkie configuation')
-        return config
-
-    def check_config(self, config):
-        exclude_directories = config['exclude_directories']
-        if type(exclude_directories) != list:
-            raise TypeError('The exclude_directories value should be a list of directories.')
-        file_types = config['file_types']
-        if type(file_types) != list:
-            raise TypeError('The file_types value should be a list of file extensions.')
+                if key in config:
+                    default_config[key] = config[key]
+        return default_config
 
     def process_config(self, config):
-        exclude_directories = config['exclude_directories']
+        exclude_directories = config['exclude-directories']
         for i in range(len(exclude_directories)):
             directory = exclude_directories[i]
             directory = os.path.join('./', directory)
             if directory.endswith('/'):
                 directory = directory[:-1]
             exclude_directories[i] = directory
-        config['exclude_directories'] = exclude_directories
+        config['exclude-directories'] = exclude_directories
 
-        file_types = config['file_types']
+        file_types = config['file-types']
         for i in range(len(file_types)):
             if not file_types[i].startswith('.'):
                 file_types[i] = '.' + file_types[i]
-        config['file_types'] = tuple(file_types)
+        config['file-types'] = tuple(file_types)
         return config
 
     def count_broken_links(self):
@@ -93,12 +100,12 @@ class Linkie:
             processed_directories = []
             for directory in directories:
                 directory_path = os.path.join(directory_root, directory)
-                if directory_path not in self.config['exclude_directories']:
+                if directory_path not in self.config['exclude-directories']:
                     processed_directories.append(directory)
             directories[:] = processed_directories
 
             for filename in files:
-                if filename.endswith(self.config['file_types']):
+                if filename.endswith(self.config['file-types']):
                     self.check_file(os.path.join(directory_root, filename))
 
     def check_file(self, file_path):
@@ -118,7 +125,7 @@ class Linkie:
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
             print('  - Checking URL {} '.format(url), end='')
-            if url in self.config['skip_urls']:
+            if url in self.config['skip-urls']:
                 print('= skipping URL (as defined in config file)')
             elif url not in self.urls:
                 try:
@@ -175,13 +182,14 @@ class Linkie:
                     print(url)
         else:
             print('No broken links found!')
+        print()
 
 
 def main():
     config_filepath = None
     if len(sys.argv) > 1:
         config_filepath = sys.argv[1]
-    linkie = Linkie(config_filepath)
+    linkie = Linkie(config_file_path=config_filepath)
     return linkie.run()
 
 

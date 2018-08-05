@@ -1,2 +1,2 @@
-exclude_directories:
+exclude-directories:
   - ignore/

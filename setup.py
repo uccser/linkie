@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests==2.18.4',
-        'PyYaml==3.12',
+        'PyYaml==4.2b4',
     ],
     python_requires='~=3.4',
     entry_points={

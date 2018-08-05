@@ -22,20 +22,20 @@ You can also pass Linkie a YAML file of configuration values (for example
 ``linkie linkie.yaml``). The YAML file can contain the following optional
 settings:
 
-1) ``exclude_directories`` - Any directories listed will be ignored, these
+1) ``exclude-directories`` - Any directories listed will be ignored, these
    are relative to the directory Linkie is run from.
-2) ``file_types`` - The file extensions to search for URLs.
-3) ``skip_urls`` - URLs to skip checking.
+2) ``file-types`` - The file extensions to search for URLs.
+3) ``skip-urls`` - URLs to skip checking.
 
 Example configuration file (these are the default values Linkie uses):
 
 .. code-block:: yaml
 
-  exclude_directories:
+  exclude-directories:
     - .git/
     - docs/build/
 
-  file_types:
+  file-types:
     - html
     - md
     - rst
@@ -49,12 +49,20 @@ Linkie can also be used within Python:
   checker = linkie.Linkie()  # Creates a linkie object.
   result = checker.run()     # Returns 1 if broken links found, otherwise 0.
 
+You can pass a dictionary of settings directly using Python:
+
+.. code-block:: python3
+
+  import linkie
+  settings = {"file-types": ["md", "rst"]}
+  checker = linkie.Linkie(config=settings)
+
 You can also use a config file within Python:
 
 .. code-block:: python3
 
   import linkie
-  checker = linkie.Linkie('linkie.yaml')  # Creates a linkie object with custom settings.
+  checker = linkie.Linkie(config_file_path='linkie.yaml')
 
 You can also access the following attributes from the linkie after it's run:
 
