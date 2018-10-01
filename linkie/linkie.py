@@ -8,6 +8,9 @@ import requests
 
 # This isn't a perfect URL matcher, but should catch the large majority of URLs.
 URL_REGEX = r'(?:https?|ftp)://[^\s`\'"\]\)>}]+'
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'
+}
 
 
 class Linkie:
@@ -129,10 +132,10 @@ class Linkie:
                 print('= skipping URL (as defined in config file)')
             elif url not in self.urls:
                 try:
-                    status_code = requests.head(url).status_code
+                    status_code = requests.head(url, headers=HEADERS).status_code
                     # If response doesn't allow HEAD request, try GET request
                     if status_code >= 400:
-                        status_code = requests.get(url).status_code
+                        status_code = requests.get(url, headers=HEADERS).status_code
                 # If connection error
                 except Exception as e:
                     status_code = str(type(e).__name__)
