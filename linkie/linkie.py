@@ -18,12 +18,12 @@ class Linkie:
         self.urls = dict()
         self.directory = '.'
         if not config and config_file_path:
-            print('Using Linkie configuration file {}'.format(config_file_path))
+            logging.info('Using Linkie configuration file {}'.format(config_file_path))
             config = self.read_config(config_file_path)
         elif config:
-            print('Using custom Linkie settings via Python constructor')
+            logging.info('Using custom Linkie settings via Python constructor')
         elif not config and not config_file_path:
-            print('Using default Linkie configuation')
+            logging.info('Using default Linkie configuation')
         config = self.check_config(config)
         self.config = self.process_config(config)
 
@@ -110,12 +110,12 @@ class Linkie:
 
     def check_file(self, file_path):
         self.file_count += 1
-        print('\nChecking file {} for URLs... '.format(file_path), end='')
+        logging.info('\nChecking file {} for URLs... '.format(file_path), end='')
         file_object = open(file_path, 'r')
         file_contents = file_object.read()
         file_object.close()
         urls = re.findall(URL_REGEX, file_contents)
-        print('{} URL{} found'.format(len(urls), 's' if len(urls) != 1 else ''))
+        logging.info('{} URL{} found'.format(len(urls), 's' if len(urls) != 1 else ''))
         for url in urls:
             # Remove extra trailing bracket if link containing brackets
             # Within Markdown link syntax.
@@ -124,9 +124,9 @@ class Linkie:
                 url += url.count('(') * ')'
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
-            print('  - Checking URL {} '.format(url), end='')
+            logging.info('  - Checking URL {} '.format(url), end='')
             if url in self.config['skip-urls']:
-                print('= skipping URL (as defined in config file)')
+                logging.info('= skipping URL (as defined in config file)')
             elif url not in self.urls:
                 try:
                     status_code = requests.head(url).status_code
@@ -138,9 +138,9 @@ class Linkie:
                     status_code = str(type(e).__name__)
 
                 if type(status_code) == str:
-                    print('= {}'.format(status_code))
+                    logging.info('= {}'.format(status_code))
                 else:
-                    print('= {} status'.format(status_code))
+                    logging.info('= {} status'.format(status_code))
 
                 if type(status_code) == str or status_code >= 400:
                     self.save_url(url, status_code, True)
@@ -149,7 +149,7 @@ class Linkie:
                 status_code = str(status_code)
                 self.status_counts[status_code] = self.status_counts.get(status_code, 0) + 1
             else:
-                print('= {} (already checked)'.format(self.urls[url]['status']))
+                logging.info('= {} (already checked)'.format(self.urls[url]['status']))
 
     def save_url(self, url, status_code, broken):
         self.urls[url] = {
@@ -160,29 +160,31 @@ class Linkie:
     def print_summary(self):
         number_broken_links = self.count_broken_links()
 
-        print('\n=============================================')
-        print('SUMMARY')
-        print('=============================================')
-        print('{} file{} checked'.format(self.file_count, 's' if self.file_count != 1 else ''))
-        print('{} unique URL{} found'.format(len(self.urls), 's' if len(self.urls) != 1 else ''))
-        print('{} broken link{} found'.format(number_broken_links, 's' if number_broken_links != 1 else ''))
+        logging.info('=============================================')
+        logging.info('SUMMARY')
+        logging.info('=============================================')
+        logging.info('{} file{} checked'.format(self.file_count, 's' if self.file_count != 1 else ''))
+        logging.info('{} unique URL{} found'.format(len(self.urls), 's' if len(self.urls) != 1 else ''))
+        logging.info('{} broken link{} found'.format(number_broken_links, 's' if number_broken_links != 1 else ''))
 
-        print('\nStatus code counts')
-        print('---------------------------------------------')
+        logging.info('---------------------------------------------')
+        logging.info('Status code counts')
+        logging.info('---------------------------------------------')
         for status in sorted(self.status_counts.keys()):
-            print('{}: {}'.format(status, self.status_counts[status]))
+            logging.info('{}: {}'.format(status, self.status_counts[status]))
         if 999 in self.status_counts:
-            print('Status 999 refers to a connection error.')
+            logging.info('Status 999 refers to a connection error.')
 
-        print('\nBroken links:')
-        print('---------------------------------------------')
+        logging.info('---------------------------------------------')
+        logging.info('Broken links:')
+        logging.info('---------------------------------------------')
         if self.count_broken_links():
             for url, url_data in self.urls.items():
                 if url_data['broken']:
-                    print(url)
+                    logging.info(url)
         else:
-            print('No broken links found!')
-        print()
+            logging.info('No broken links found!')
+        logging.info()
 
 
 def main():
