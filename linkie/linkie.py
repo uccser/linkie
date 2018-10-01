@@ -185,7 +185,6 @@ class Linkie:
                     logging.info(url)
         else:
             logging.info('No broken links found!')
-        logging.info()
 
 
 def main():
