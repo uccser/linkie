@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import yaml
+import logging
 import requests
 
 # This isn't a perfect URL matcher, but should catch the large majority of URLs.
