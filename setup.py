@@ -5,11 +5,17 @@ from linkie import __version__
 if not sys.version_info[0] == 3:
     sys.exit('Sorry, currently only Python 3 is supported.')
 
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
+
+with open('README.rst') as f:
+    long_description = f.read()
+
 setup(
     name='linkie',
     version=__version__,
     description='Linkie looks through files for broken links using Python 3.',
-    long_description=open('README.rst').read(),
+    long_description=long_description,
     url='https://github.com/uccser/linkie',
     author=('University of Canterbury Computer'
             'Science Education Research Group'),
@@ -28,14 +34,11 @@ setup(
     keywords='link url checker',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'requests==2.18.4',
-        'PyYaml==4.2b4',
-    ],
+    install_requires=requirements,
     python_requires='~=3.4',
     entry_points={
         'console_scripts': [
             'linkie = linkie.linkie:main',
         ],
     }
-    )
+)
