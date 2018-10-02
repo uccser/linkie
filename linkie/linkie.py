@@ -114,12 +114,12 @@ class Linkie:
 
     def check_file(self, file_path):
         self.file_count += 1
-        logging.info('Checking file {} for URLs... '.format(file_path))
+        file_message = 'Checking file {} for URLs... '.format(file_path)
         file_object = open(file_path, 'r')
         file_contents = file_object.read()
         file_object.close()
         urls = re.findall(URL_REGEX, file_contents)
-        logging.info('{} URL{} found'.format(len(urls), 's' if len(urls) != 1 else ''))
+        logging.info('{}{} URL{} found'.format(file_message, len(urls), 's' if len(urls) != 1 else ''))
         for url in urls:
             # Remove extra trailing bracket if link containing brackets
             # Within Markdown link syntax.
@@ -128,9 +128,9 @@ class Linkie:
                 url += url.count('(') * ')'
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
-            logging.info('  - Checking URL {} '.format(url))
+            message = '  - Checking URL {} '.format(url)
             if url in self.config['skip-urls']:
-                logging.info('= skipping URL (as defined in config file)')
+                message += '= skipping URL (as defined in config file)'
             elif url not in self.urls:
                 try:
                     status_code = requests.head(url, headers=HEADERS).status_code
@@ -142,9 +142,9 @@ class Linkie:
                     status_code = str(type(e).__name__)
 
                 if type(status_code) == str:
-                    logging.info('= {}'.format(status_code))
+                    message += '= {}'.format(status_code)
                 else:
-                    logging.info('= {} status'.format(status_code))
+                    message += '= {} status'.format(status_code)
 
                 if type(status_code) == str or status_code >= 400:
                     self.save_url(url, status_code, True)
@@ -153,7 +153,8 @@ class Linkie:
                 status_code = str(status_code)
                 self.status_counts[status_code] = self.status_counts.get(status_code, 0) + 1
             else:
-                logging.info('= {} (already checked)'.format(self.urls[url]['status']))
+                message += '= {} (already checked)'.format(self.urls[url]['status'])
+            logging.info(message)
 
     def save_url(self, url, status_code, broken):
         self.urls[url] = {
