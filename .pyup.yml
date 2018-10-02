@@ -1,0 +1,4 @@
+# Settings for pyup bot
+# Details here: https://pyup.io/docs/configuration/
+
+branch: develop
