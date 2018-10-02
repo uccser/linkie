@@ -114,7 +114,7 @@ class Linkie:
 
     def check_file(self, file_path):
         self.file_count += 1
-        logging.info('\nChecking file {} for URLs... '.format(file_path), end='')
+        logging.info('Checking file {} for URLs... '.format(file_path))
         file_object = open(file_path, 'r')
         file_contents = file_object.read()
         file_object.close()
@@ -128,7 +128,7 @@ class Linkie:
                 url += url.count('(') * ')'
             # Remove trailing characters
             url = url.rstrip('!"#$%&\'*+,-./@:;=^_`|~')
-            logging.info('  - Checking URL {} '.format(url), end='')
+            logging.info('  - Checking URL {} '.format(url))
             if url in self.config['skip-urls']:
                 logging.info('= skipping URL (as defined in config file)')
             elif url not in self.urls:
