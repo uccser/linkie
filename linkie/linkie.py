@@ -144,16 +144,16 @@ class Linkie:
         urls = re.findall(URL_REGEX, file_contents)
         logging.info('{}{} URL{} found'.format(file_message, len(urls), 's' if len(urls) != 1 else ''))
         for url in urls:
+            # Remove trailing characters
+            url = url.rstrip('> !"#$%&\'*+,-./@:;=^_`|~').lstrip(' <(=\"')
+            # Remove extra trailing bracket if link containing brackets
+            # within Markdown link syntax.
+            # [Wikipedia link](http://foo.com/blah_blah_(wikipedia))
+            if url.count('('):
+                url += url.count('(') * ')'
             self.unchecked_urls.add(url)
 
     def check_link(self, url):
-        # Remove trailing characters
-        url = url.rstrip('> !"#$%&\'*+,-./@:;=^_`|~').lstrip(' <(=\"')
-        # Remove extra trailing bracket if link containing brackets
-        # within Markdown link syntax.
-        # [Wikipedia link](http://foo.com/blah_blah_(wikipedia))
-        if url.count('('):
-            url += url.count('(') * ')'
         message = '  - Checking URL {} '.format(url)
         if url in self.config['skip-urls']:
             message += '= skipping URL (as defined in config file)'
