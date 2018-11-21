@@ -26,7 +26,7 @@ class Linkie:
         self.file_count = 0
         self.status_counts = {}
         self.urls = dict()
-        self.unchecked_urls = []
+        self.unchecked_urls = set()
         self.directory = '.'
         self.pool = ThreadPool(THREADS)
         if not config and config_file_path:
@@ -131,6 +131,7 @@ class Linkie:
             self.urls.__delitem__(url)
         if len(connect_errors):
             logging.info('Rechecking {} link{} that returned ConnectionError... '.format(len(connect_errors), 's' if len(connect_errors) != 1 else ''))
+            self.pool = ThreadPool(min(THREADS, len(connect_errors)))
             self.pool.map(self.check_link, connect_errors)
 
 
@@ -142,7 +143,8 @@ class Linkie:
         file_object.close()
         urls = re.findall(URL_REGEX, file_contents)
         logging.info('{}{} URL{} found'.format(file_message, len(urls), 's' if len(urls) != 1 else ''))
-        self.unchecked_urls += urls
+        for url in urls:
+            self.unchecked_urls.add(url)
 
     def check_link(self, url):
         # Remove trailing characters
