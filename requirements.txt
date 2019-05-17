@@ -1,5 +1,5 @@
 # Core requirements that also requires updating in setup.py
-requests==2.20.0
+requests==2.22.0
 PyYaml==4.2b4
 
 # Developer requirements
