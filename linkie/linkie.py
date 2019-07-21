@@ -121,7 +121,7 @@ class Linkie:
                 if filename.endswith(self.config['file-types']):
                     self.search_file(os.path.join(directory_root, filename))
         self.pool.map(self.check_link, self.unchecked_urls)
-    
+
     def traverse_connection_errors(self):
         connect_errors = []
         for url, url_data in self.urls.items():
@@ -185,7 +185,7 @@ class Linkie:
             'broken': broken,
             'status': status_code,
         }
-    
+
     def collect_status_counts(self):
         for _, url_data in self.urls.items():
             status_code = str(url_data['status'])
@@ -231,4 +231,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
