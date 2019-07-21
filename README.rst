@@ -81,6 +81,14 @@ more details.
 Changelog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0
+------------------------------------------------------------------------------
+
+- Update to only check links prefixed by one of [=", (, <, ' '(a space)].
+- Linkie now finds all unique links at once, then uses multithreading to check them all.
+- Linkie now rechecks links that had a ConnectionError, as these are often valid.
+- Broken links in the SUMMARY are now also displayed with their status code.
+
 1.3.1
 ------------------------------------------------------------------------------
 
