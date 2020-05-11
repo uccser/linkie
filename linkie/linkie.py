@@ -138,7 +138,7 @@ class Linkie:
         repeat_count = 1
         max_repeats = 1000000
         while len(self.delayed_urls) > 0 and repeat_count <= max_repeats:
-            # Many iterations are expected because the timeout may still be going each time this repeats itself, so thepool map will end immediately
+            # Many iterations are expected because the timeout may still be going each time this repeats itself, so the pool map will end immediately
             # Only uncomment this line if debugging locally
             # print('Retrying delayed urls **MANY ITERATIONS ARE EXPECTED** #{}'.format(repeat_count), end='\r')
             repeat_urls = self.delayed_urls[:]
