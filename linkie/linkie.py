@@ -28,10 +28,10 @@ class Linkie:
     def __init__(self, config=None, config_file_path=None):
         self.file_count = 0
         self.status_counts = {}
-        self.urls = dict()
-        self.domains = dict()
-        self.unchecked_urls = set()
-        self.delayed_urls = []
+        self.urls = dict()          # Dictionary of URLs that have been checked, with their broken status and status code
+        self.domains = dict()       # Dictionary of URL domains and when they were last requested from (429 code)
+        self.unchecked_urls = set() # Initial set of urls to be checked
+        self.delayed_urls = []      # List of urls to be checked later (429 code)
         self.directory = '.'
         self.pool = ThreadPool(THREADS)
         self.lock = Lock()
