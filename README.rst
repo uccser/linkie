@@ -84,8 +84,9 @@ Changelog
 1.4.1
 ------------------------------------------------------------------------------
 
-- Add logic to delay Linkie requesting from a domain if it responds with code 429
-- Reorganise logging output so that the URL is printed last
+- Add logic to delay Linkie requesting from a domain if it responds with code 429.
+- Reorganise logging output so that the URL is printed last.
+- Update dependencies.
 
 1.4.0
 ------------------------------------------------------------------------------
