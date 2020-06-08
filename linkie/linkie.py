@@ -6,7 +6,9 @@ import sys
 import yaml
 import logging
 import requests
+import time
 from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing.dummy import Lock
 
 # This isn't a perfect URL matcher, but should catch the large majority of URLs.
 # This now matches URLs presented in the format defined in the CSU Writing Guide
@@ -18,6 +20,7 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'
 }
 THREADS = 12
+TIMEOUT = 60 #s
 
 
 class Linkie:
@@ -25,10 +28,13 @@ class Linkie:
     def __init__(self, config=None, config_file_path=None):
         self.file_count = 0
         self.status_counts = {}
-        self.urls = dict()
-        self.unchecked_urls = set()
+        self.urls = dict()          # Dictionary of URLs that have been checked, with their broken status and status code
+        self.domains = dict()       # Dictionary of URL domains and when they were last requested from (429 code)
+        self.unchecked_urls = set() # Initial set of urls to be checked
+        self.delayed_urls = []      # List of urls to be checked later (429 code)
         self.directory = '.'
         self.pool = ThreadPool(THREADS)
+        self.lock = Lock()
         if not config and config_file_path:
             logging.info('Using Linkie configuration file {}'.format(config_file_path))
             config = self.read_config(config_file_path)
@@ -90,6 +96,13 @@ class Linkie:
                 file_types[i] = '.' + file_types[i]
         config['file-types'] = tuple(file_types)
         return config
+    
+    def get_domain(self, url):
+        # Return everything before the third /
+        # i.e https://example.com/subpage/?hello-there&general-kenobi
+        # becomes https://example.com
+        url_parts = url.split('/')
+        return '/'.join(url_parts[:3])
 
     def count_broken_links(self):
         count = 0
@@ -122,6 +135,19 @@ class Linkie:
                     self.search_file(os.path.join(directory_root, filename))
         self.pool.map(self.check_link, self.unchecked_urls)
 
+        repeat_count = 1
+        max_repeats = 1000000
+        while len(self.delayed_urls) > 0 and repeat_count <= max_repeats:
+            # Many iterations are expected because the timeout may still be going each time this repeats itself, so the pool map will end immediately
+            # Only uncomment this line if debugging locally
+            # print('Retrying delayed urls **MANY ITERATIONS ARE EXPECTED** #{}'.format(repeat_count), end='\r')
+            repeat_urls = self.delayed_urls[:]
+            self.delayed_urls = []
+            self.pool.map(self.check_link, repeat_urls)
+            repeat_count += 1
+        if repeat_count > max_repeats:
+            logging.critical("Infinite loop in retrying delayed urls. The timeout period can't have ended!")
+
     def traverse_connection_errors(self):
         connect_errors = []
         for url, url_data in self.urls.items():
@@ -151,12 +177,26 @@ class Linkie:
             # [Wikipedia link](http://foo.com/blah_blah_(wikipedia))
             if url.count('('):
                 url += url.count('(') * ')'
+            self.domains[self.get_domain(url)] = -1
             self.unchecked_urls.add(url)
 
     def check_link(self, url):
-        message = '  - Checking URL {} '.format(url)
+        domain = self.get_domain(url)
+        self.lock.acquire()
+        time_at_429 = self.domains[domain]
+        is_ready = time_at_429 < 0 or time.perf_counter() - time_at_429 > TIMEOUT
+        if is_ready:
+            self.domains[domain] = -1
+        self.lock.release()
+        if not is_ready:
+            # Put the url back to be checked later
+            self.lock.acquire()
+            self.delayed_urls.append(url)
+            self.lock.release()
+            return
+        message = '  - '
         if url in self.config['skip-urls']:
-            message += '= skipping URL (as defined in config file)'
+            message += 'Skipping URL (as defined in config file)'
         elif url not in self.urls:
             try:
                 status_code = requests.head(url, headers=HEADERS).status_code
@@ -168,16 +208,26 @@ class Linkie:
                 status_code = str(type(e).__name__)
 
             if type(status_code) == str:
-                message += '= {}'.format(status_code)
+                message += '{}'.format(status_code)
             else:
-                message += '= {} status'.format(status_code)
+                message += 'Status {}'.format(status_code)
 
             if type(status_code) == str or status_code >= 400:
-                self.save_url(url, status_code, True)
+                if status_code == 429: # Too many requests
+                    message += " => Delaying requests to the domain {} for {} seconds".format(domain, TIMEOUT)
+                    self.lock.acquire()
+                    # Save the time the request was made
+                    self.domains[domain] = time.perf_counter()
+                    # Put the url back to be checked again later
+                    self.delayed_urls.append(url)
+                    self.lock.release()
+                else:
+                    self.save_url(url, status_code, True)
             else:
                 self.save_url(url, status_code, False)
         else:
-            message += '= {} (already checked)'.format(self.urls[url]['status'])
+            message += '{} (already checked)'.format(self.urls[url]['status'])
+        message += ' = {}'.format(url)
         logging.info(message)
 
     def save_url(self, url, status_code, broken):
